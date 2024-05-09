@@ -1,0 +1,35 @@
+name: maria_efs
+run-name: ${{ github.actor }} Pipeline deploy
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - images/**
+      - .github/workflows/main.yml
+jobs:
+  efs-senai:
+    runs-on: ubuntu:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalacao SSH
+        run: sudo apt-get install -y openssh-client
+
+      - name: Verificacao da chave .pem
+        run: echo "$KEY_PATH" 
+        env: 
+          KEY_PATH: ${{ secrets.CHAVE_PEM }}
+
+      - name: Adicionar host EC2 ao Known_hosts
+        run: |
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ''
+          ssh-keyscan -H 54.86.128.241 >> ~/.ssh/known_hosts
+
+      - name: Envio das imagens SCP
+        if: always()
+        run: |
+          echo "$KEY_PATH" > ./labuser.pem
+          cdmod 600 ./labuser.pem
+          scp -i ./labuser.pem images/*.* ec2-user@54.86.128.241:/
