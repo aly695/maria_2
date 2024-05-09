@@ -31,5 +31,5 @@ jobs:
         if: always()
         run: |
           echo "$KEY_PATH" > ./labuser.pem
-          cdmod 600 ./labuser.pem
+          cdmod 600 ./labuser (1).pem
           scp -i ./labuser.pem images/*.* ec2-user@54.86.128.241:/
